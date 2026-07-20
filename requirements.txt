@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pydantic
+
+langchain>=1.0.0
+langchain-core>=1.4.7
+langchain-anthropic>=1.4.8
+langchain-google-genai>=4.2.7
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-langchain>=0.62.1
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-httpx
+opentelemetry-instrumentation-logging

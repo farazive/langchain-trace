@@ -1,0 +1,30 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+
+exporters:
+  # "otlp" is a deprecated alias for "otlp_grpc" in current collector releases.
+  otlp_grpc/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Prints spans to the collector's stdout. Keep this: when Jaeger looks empty,
+  # `docker compose logs otel-collector` tells you immediately whether the
+  # problem is upstream (app not exporting) or downstream (jaeger link).
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_grpc/jaeger, debug]

@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Source is baked into the image by the Dockerfile; this shadows it with
+      # the working tree so a code edit needs `docker compose restart app`
+      # rather than a full `--build`. Read-only: the container never writes to
+      # your source. Note requirements.txt changes still need `--build`, since
+      # dependencies are installed into the image at build time.
+      - ./app:/srv/app:ro
+    env_file:
+      - .env
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: langchain-chat
+    depends_on:
+      - otel-collector
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: cr.jaegertracing.io/jaegertracing/jaeger:2.19.0
+    # Only the UI is published. Jaeger also listens on 4317, but that stays on
+    # the compose network as jaeger:4317 -- publishing it would collide with the
+    # collector's 4317 and the stack would fail to start.
+    ports:
+      - "16686:16686"
