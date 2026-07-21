@@ -19,6 +19,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 log = logging.getLogger(__name__)
 
+#https://docs.langchain.com/langsmith/trace-with-opentelemetry
 
 def setup_telemetry(app) -> TracerProvider:
     """Wire up the tracer provider and every instrumentor.
